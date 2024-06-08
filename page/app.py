@@ -10,6 +10,7 @@ cursor = conn.cursor()
 
 currentPage = 1
 max = 1
+project = 1
 
 @app.route("/<currentPage>", methods =['GET', 'POST'])
 def OurProjects(currentPage=1):
@@ -42,34 +43,13 @@ def changePage(action):
             currentPage -= 1
     return redirect(url_for('OurProjects', currentPage=currentPage))
 
-@app.route("/gallery/<currentPage>", methods = ["GET", "POST"])
-def GalleryPage(currentPage=1):
-    global max
-    startIn = (int(currentPage)-1)*2+int(currentPage)
-    endIn = int(currentPage)*3
-    cursor.execute("SELECT * FROM images WHERE id between " + str(startIn) + " AND " + str(endIn))
+@app.route("/project/<ID>", methods =['GET', 'POST'])
+def ProjectPage(ID=1):
+
+    cursor.execute("SELECT * FROM projectImages WHERE ID == " + ID)
+
+
     rows = cursor.fetchall()
-    print(rows)
 
-    query = "SELECT * FROM images"
-    cursor.execute(query)
-    data = cursor.fetchall()
-    max = math.ceil(len(data)/3)
-
-    return render_template('gallery.html', rows = rows, currentPage=currentPage, max = max) 
-
-
-@app.route("/gallery/change/<action>", methods = ["GET", "POST"])
-def changePage(action):
-    global currentPage
-    global max
-    if action == "INC":
-        if currentPage + 1 <= max:
-            currentPage += 1
-    elif currentPage - 1 > 0:
-        currentPage -= 1
-    return redirect(url_for('GalleryPage', currentPage=currentPage))
-
-@app.route("/contacts/", methods = ["GET", "POST"])
-def contactPage():
-    return render_template('contact.html') 
+    print("----------------"+str(rows))
+    return render_template('projectDetailsPage.html', data = rows[0])
